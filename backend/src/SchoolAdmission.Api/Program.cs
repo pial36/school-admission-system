@@ -28,6 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddSingleton(TimeProvider.System); // replaceable "clock" for tests
 builder.Services.AddScoped<ClassService>();
 builder.Services.AddScoped<HoldService>();
+builder.Services.AddHostedService<ExpiredHoldSweeper>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new UtcDateTimeOffsetConverter()));
@@ -74,7 +75,20 @@ static async Task MigrateDatabaseAsync(WebApplication app)
         {
             using var scope = app.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            await db.Database.MigrateAsync();
+
+            // If two backend processes start together, a PostgreSQL advisory lock
+            // makes them migrate one after the other instead of colliding.
+            await db.Database.OpenConnectionAsync();
+            try
+            {
+                await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_lock(727001)");
+                await db.Database.MigrateAsync();
+            }
+            finally
+            {
+                await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_unlock(727001)");
+                await db.Database.CloseConnectionAsync();
+            }
             logger.LogInformation("Database is up to date.");
             return;
         }

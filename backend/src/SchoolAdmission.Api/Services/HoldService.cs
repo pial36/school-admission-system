@@ -29,8 +29,15 @@ public class HoldService
 
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
-        // TODO(step 4): lock the class row here so concurrent requests cannot oversell.
-        var schoolClass = await _db.Classes.FirstOrDefaultAsync(c => c.Id == classId, ct)
+        // CONCURRENCY GUARD: lock this class's row until the transaction ends.
+        // Every other "apply" request for the SAME class waits here, so the
+        // count-then-insert below runs one request at a time per class.
+        // The lock lives in PostgreSQL, so it also works across several backend
+        // processes sharing one database. Other classes are not blocked.
+        var schoolClass = (await _db.Classes
+                .FromSqlInterpolated($"SELECT * FROM classes WHERE id = {classId} FOR UPDATE")
+                .ToListAsync(ct))
+            .FirstOrDefault()
             ?? throw ApiException.NotFound(ErrorCodes.ClassNotFound, "This class does not exist.");
 
         // Turn this class's timed-out holds into EXPIRED rows first, so they stop
