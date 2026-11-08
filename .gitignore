@@ -1,0 +1,31 @@
+# --- .NET ---
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+
+# --- Node / Vite ---
+node_modules/
+dist/
+*.local
+
+# --- Environment files (may hold secrets) ---
+.env
+.env.*
+!.env.example
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Local AI-tool caches ---
+ruvector.db
+.claude-flow/
+.swarm/
+
+# --- Assignment brief (confidential, must not be published) ---
+*.pdf

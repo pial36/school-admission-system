@@ -1,0 +1,4 @@
+# Normalize line endings so shell scripts work inside Linux Docker containers
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf
