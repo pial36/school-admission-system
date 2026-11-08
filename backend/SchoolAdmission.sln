@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{43D48E05-319
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolAdmission.Api", "src\SchoolAdmission.Api\SchoolAdmission.Api.csproj", "{1BE27A64-CBB2-48FA-B104-68D5124D4997}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DA35ED93-B53C-438F-99A9-9145020D3BEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolAdmission.Api.Tests", "tests\SchoolAdmission.Api.Tests\SchoolAdmission.Api.Tests.csproj", "{978D16D3-A49C-4991-99F9-818CAF74DB7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +24,13 @@ Global
 		{1BE27A64-CBB2-48FA-B104-68D5124D4997}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BE27A64-CBB2-48FA-B104-68D5124D4997}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BE27A64-CBB2-48FA-B104-68D5124D4997}.Release|Any CPU.Build.0 = Release|Any CPU
+		{978D16D3-A49C-4991-99F9-818CAF74DB7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{978D16D3-A49C-4991-99F9-818CAF74DB7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{978D16D3-A49C-4991-99F9-818CAF74DB7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{978D16D3-A49C-4991-99F9-818CAF74DB7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1BE27A64-CBB2-48FA-B104-68D5124D4997} = {43D48E05-3199-4135-B7E6-4B7D5B29EEFA}
+		{978D16D3-A49C-4991-99F9-818CAF74DB7C} = {DA35ED93-B53C-438F-99A9-9145020D3BEA}
 	EndGlobalSection
 EndGlobal
