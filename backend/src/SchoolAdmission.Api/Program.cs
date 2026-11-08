@@ -49,7 +49,10 @@ builder.Services.Configure<ApiBehaviorOptions>(o =>
 builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
     .AllowAnyOrigin()
     .AllowAnyHeader()
-    .AllowAnyMethod()));
+    .AllowAnyMethod()
+    // Lets the UI read the server time and show correct countdowns
+    // even if the user's computer clock is wrong.
+    .WithExposedHeaders("Date")));
 
 var app = builder.Build();
 

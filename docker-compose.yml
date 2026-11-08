@@ -1,4 +1,4 @@
-# Start everything:      docker compose up --build
+# Start everything:      docker compose up --build   -> UI http://localhost:3000, API http://localhost:8080
 # Run backend tests:     docker compose --profile test run --rm backend-tests
 # Stop (data is kept):   docker compose down
 # Stop + wipe data:      docker compose down -v
@@ -34,6 +34,18 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      # Backend URL as the BROWSER sees it (applied at container start, no rebuild needed).
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:8080}
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
     restart: unless-stopped
 
   # Only started on demand (profile "test"), never by plain `docker compose up`.
