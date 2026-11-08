@@ -6,6 +6,10 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
+# ---------- test stage: used by `docker compose --profile test run --rm frontend-tests` ----------
+FROM build AS test
+CMD ["npm", "test"]
+
 # ---------- runtime stage: nginx serves the static files ----------
 FROM nginx:1.27-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf

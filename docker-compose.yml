@@ -1,5 +1,6 @@
 # Start everything:      docker compose up --build   -> UI http://localhost:3000, API http://localhost:8080
 # Run backend tests:     docker compose --profile test run --rm backend-tests
+# Run frontend tests:    docker compose --profile test run --rm frontend-tests
 # Stop (data is kept):   docker compose down
 # Stop + wipe data:      docker compose down -v
 
@@ -60,6 +61,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  frontend-tests:
+    profiles: ["test"]
+    build:
+      context: ./frontend
+      target: test
 
 volumes:
   pgdata:
