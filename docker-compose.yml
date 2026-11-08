@@ -1,0 +1,53 @@
+# Start everything:      docker compose up --build
+# Run backend tests:     docker compose --profile test run --rm backend-tests
+# Stop (data is kept):   docker compose down
+# Stop + wipe data:      docker compose down -v
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: school_admission
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      # Named volume -> data survives `docker compose down` / `up`.
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d school_admission"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      target: runtime
+    environment:
+      # Database connection (override to point at another database).
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=school_admission;Username=postgres;Password=postgres"
+      # How long a seat is held before it is released automatically.
+      HOLD_DURATION_SECONDS: ${HOLD_DURATION_SECONDS:-600}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Only started on demand (profile "test"), never by plain `docker compose up`.
+  backend-tests:
+    profiles: ["test"]
+    build:
+      context: ./backend
+      target: test
+    environment:
+      # Tests create their own throw-away database on this server.
+      TEST_DB_CONNECTION: "Host=db;Port=5432;Username=postgres;Password=postgres"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

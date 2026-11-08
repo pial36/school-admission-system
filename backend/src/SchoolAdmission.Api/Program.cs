@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using Npgsql;
 using SchoolAdmission.Api.Contracts;
 using SchoolAdmission.Api.Data;
 using SchoolAdmission.Api.Infrastructure;
@@ -75,6 +78,16 @@ static async Task MigrateDatabaseAsync(WebApplication app)
         {
             using var scope = app.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            // The advisory lock below needs a connection, so the database itself
+            // must exist first. Create it if missing (another process may win the
+            // race — "already exists" (42P04) is fine).
+            var creator = db.GetService<IRelationalDatabaseCreator>();
+            if (!await creator.ExistsAsync())
+            {
+                try { await creator.CreateAsync(); }
+                catch (PostgresException e) when (e.SqlState == PostgresErrorCodes.DuplicateDatabase) { }
+            }
 
             // If two backend processes start together, a PostgreSQL advisory lock
             // makes them migrate one after the other instead of colliding.

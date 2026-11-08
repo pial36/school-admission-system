@@ -64,7 +64,23 @@ public class ApiFixture : IAsyncLifetime
     public async Task DisposeAsync()
     {
         foreach (var f in _factories) await f.DisposeAsync();
-        if (_container != null) await _container.DisposeAsync();
+
+        if (_container != null)
+        {
+            await _container.DisposeAsync();
+        }
+        else
+        {
+            // Shared server: drop our throw-away database so test runs leave nothing behind.
+            NpgsqlConnection.ClearAllPools();
+            var builder = new NpgsqlConnectionStringBuilder(ConnectionString);
+            var dbName = builder.Database;
+            builder.Database = "postgres";
+            await using var conn = new NpgsqlConnection(builder.ConnectionString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand($"DROP DATABASE IF EXISTS \"{dbName}\" WITH (FORCE)", conn);
+            await cmd.ExecuteNonQueryAsync();
+        }
     }
 }
 
