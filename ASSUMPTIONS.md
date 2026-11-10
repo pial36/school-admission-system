@@ -4,23 +4,17 @@ Decisions I made where the brief did not say exactly what to do, and why.
 
 ## Students and identity
 
-1. **Student ID = exactly 17 digits.** The brief says the birth registration number is
-   17 digits, so `X-Student-Id` must match `^\d{17}$`. Anything else → `400 INVALID_STUDENT_ID`.
-   No checksum or real-registry check — there is no source for that.
-2. **No login, no admin role.** The brief says no login is needed, so the “Create class”
-   screen and `POST /classes` are open to anyone. In a real system this would be behind
+1. **Student ID = exactly 17 digits.** The brief says the birth registration number is 17 digits, so `X-Student-Id` must match `^\d{17}$`. Anything else → `400 INVALID_STUDENT_ID`.No checksum or real-registry check — there is no source for that.
+2. **No login, no admin role.** The brief says no login is needed, so the “Create class” screen and `POST /classes` are open to anyone. In a real system this would be behind
    admin authentication.
-3. **`GET /holds/{holdId}` does not need `X-Student-Id`**, because the contract lists no
-   header for it. Hold IDs are random GUIDs, so they cannot be guessed. Changing anything
+3. **`GET /holds/{holdId}` does not need `X-Student-Id`**, because the contract lists no header for it. Hold IDs are random GUIDs, so they cannot be guessed. Changing anything
    (confirm, cancel) does require the header and must be the owner (`403 NOT_YOUR_HOLD` otherwise).
 
 ## Seats and applications
 
-4. **“One active application per student per class”** means at most one `HELD` or
-   `CONFIRMED` application per (student, class). A student **may** hold seats in different
+4. **“One active application per student per class”** means at most one `HELD` or `CONFIRMED` application per (student, class). A student **may** hold seats in different
    classes at the same time (e.g. Morning and Day shift) — the brief only limits it per class.
-5. **After an application expires or is cancelled, the student may apply again** to the same
-   class (if a seat is free). After it is confirmed they cannot apply again to that class
+5. **After an application expires or is cancelled, the student may apply again** to the same class (if a seat is free). After it is confirmed they cannot apply again to that class
    (`409 ALREADY_CONFIRMED`).
 6. **A confirmed admission cannot be cancelled** through the API (`409 ALREADY_CONFIRMED`).
    The fee is already paid; a refund/withdrawal is an office process, not part of this brief.
