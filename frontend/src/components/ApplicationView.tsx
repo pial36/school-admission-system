@@ -9,7 +9,8 @@ import { ErrorBox, StatusBadge, SuccessBox } from './common';
  * The countdown runs every second; when it reaches 0 the status flips to
  * EXPIRED and the pay button is disabled immediately, without a reload.
  */
-export function ApplicationView({ holdId, studentId }: { holdId: string; studentId: string }) {
+export function ApplicationView({ holdId, studentId }: { holdId: string; studentId: string }) 
+{
   const loader = useCallback(() => api.getHold(holdId), [holdId]);
   const { data: hold, error, loading, reload } = usePolling(loader, 3000, holdId);
   const now = useNow();
@@ -39,7 +40,7 @@ export function ApplicationView({ holdId, studentId }: { holdId: string; student
     try {
       if (kind === 'pay') {
         await api.confirm(holdId, studentId);
-        setSuccess('Payment received — admission confirmed! 🎉');
+        setSuccess('Payment received — admission confirmed!');
       } else {
         await api.cancel(holdId, studentId);
         setSuccess('Application cancelled. The seat has been released.');
